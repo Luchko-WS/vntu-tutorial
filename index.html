@@ -4,83 +4,191 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Vntu tutorial</title>
+    <title>Weather</title>
 
     <base href="/"/>
 
-    <link href="bower_components/bootstrap/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="assets/css/main.css" rel="stylesheet">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/c3/c3.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/webfont/Fontsaddict.css">
+
 </head>
-<body ng-app="MainApp">
-<!-- Fixed navbar -->
-<nav class="navbar navbar-inverse navbar-fixed-top">
-    <div class="container">
-        <div class="navbar-header">
-            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
-                    aria-expanded="false" aria-controls="navbar">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-            </button>
-            <a class="navbar-brand" href="#">Bootstrap theme</a>
-        </div>
-        <div id="navbar" class="navbar-collapse collapse">
-            <ul class="nav navbar-nav">
-                <li class="active"><a href="#">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li class="dropdown">
-                    <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true"
-                       aria-expanded="false">Dropdown <span class="caret"></span></a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">Action</a></li>
-                        <li><a href="#">Another action</a></li>
-                        <li><a href="#">Something else here</a></li>
-                        <li role="separator" class="divider"></li>
-                        <li class="dropdown-header">Nav header</li>
-                        <li><a href="#">Separated link</a></li>
-                        <li><a href="#">One more separated link</a></li>
-                    </ul>
-                </li>
-            </ul>
-        </div><!--/.nav-collapse -->
-    </div>
-</nav>
+<body ng-app="MainApp" background="assets/img/background.jpg">
 
-<div class="container" role="main" ng-controller="MainController">
-
-    <!-- Main jumbotron for a primary marketing message or call to action -->
-    <div class="jumbotron">
-        <h1>Your answer: {{answer}}</h1>
-        <p>This is a template showcasing the optional theme stylesheet included in Bootstrap. Use it as a starting point
-            to create something more unique by building on or modifying it.</p>
-    </div>
-
-
+<!--Хедер-->
     <div class="page-header">
-        <h1>Buttons</h1>
+        <h1 class="text-center">Прогноз погоди {{cityName}}</h1>
     </div>
-    <p>
-        <button type="button" ng-click="setAnswer('May be')" class="btn btn-lg btn-default">May be</button>
-        <button type="button" ng-click="setAnswer('No')" class="btn btn-lg btn-danger">No</button>
-        <button type="button" ng-click="setAnswer('Yes')" class="btn btn-lg btn-success">Yes</button>
-        <button type="button" ng-click="getPosts()" class="btn btn-lg btn-primary">get posts</button>
-    </p>
 
-    <ul ng-if="posts">
-        <li ng-repeat="post in posts">
-            <h2>#{{post.id}}</h2>
-            <div>#{{post.name}}</div>
-        </li>
-    </ul>
+    <div class="container">
+        <div class="row padded">
+            <div class="col-lg-2 col-md-1 col-sm-1 col-xs-1"> </div>
+            <div class="col-lg-8 col-md-10 col-sm-10 col-xs-10">
+                <div class="block2">
+                    <div class="input-group" ng-hide="toHide">
+                        <input type="text" class="form-control" placeholder="Назва міста..." ng-model="cityName">
+                        <div class="input-group-btn">
+                            <button ng-click="" class="btn btn-primary" type="button">Пошук!</button>
+                            #include virtual="file.php"
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-2 col-md-1 col-sm-1 col-xs-1">
+                <div class="block3"> </div>
+            </div>
+        </div>
 
-</div> <!-- /container -->
+        <div style="height: 20px"></div>
 
-<script src="bower_components/angular/angular.min.js"></script>
-<script src="bower_components/angular-resource/angular-resource.min.js"></script>
-<script src="app/main.js"></script>
-<!--<script src="app/models/PostModel.js"></script>-->
-<!--<script src="app/controllers/MainCtrl.js"></script>-->
+        <!--Прогноз (зображення і текст)-->
+        <div name="weatherInfo">
+            <div class="row padded" ng-hide="toHide">
+                <div ng-controller="weatherCurrentItemCtrl">
+                    <div class="col-lg-2 col-md-1 col-sm-1 col-xs-1"> </div>
+                    <div class="col-lg-8 col-md-10 col-sm-10 col-xs-10">
+                        <!--зображення-->
+                        <div class="thumbnail">
+                            <img ng-src="{{data.weather[0].main | formatLargeIconFilter}}" width="320px" heidht ="320px" alt="..." class="img-rounded">
+                            <!--текст-->
+                            <div class="caption">
+                                <p class="text-center"><b>{{data.name}}</b></p>
+                                <p class="text-center">Атмосферний тиск: {{data.main.pressure}} мм</p>
+                                <p class="text-center">Температура: {{data.main.temp}} °С</p>
+                                <p class="text-center">Вітер: {{data.wind.speed}} м/с</p>
+                                <p class="text-center">Вологість: {{data.main.humidity}}%</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-2 col-md-1 col-sm-1 col-xs-1"> </div>
+            </div>
+
+            <!--Блок з графіком-->
+            <div ng-controller="weatherListCtrl">
+                <div class="row padded">
+                    <div class="col-lg-2 col-md-1 col-sm-1 col-xs-1"> </div>
+                    <div class="col-lg-8 col-md-10 col-sm-10 col-xs-10">
+
+                        <div class="thumbnail" id="chart"></div>
+
+                    </div>
+                    <div class="col-lg-2 col-md-1 col-sm-1 col-xs-1"> </div>
+                </div>
+
+                <!-- Панелька з іконками -->
+                <div class="row padded">
+                    <div class="col-lg-2 col-md-1 col-sm-1 col-xs-1"> </div>
+                    <div class="col-lg-8 col-md-10 col-sm-10 col-xs-10">
+                        <div class="thumbnail">
+                            <div class="scale-of-measurement">
+                                <div class="row padded">
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-0"> </div>
+                                    <div class ="col-lg-2 col-md-2 col-sm-2 col-xs-4">
+                                        <div class="scale-of-measurement__item, text-center">
+                                            <div class="{{data.list[0].weather[0].main | formatIconFilter}}"></div>
+                                            <p class="text-center"><small>{{data.list[0].dt | formatDayOfWeekFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[0].dt | formaShortDateFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[0].temp.day | formatTempFilter}} </small></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-4">
+                                        <div class="scale-of-measurement__item, text-center">
+                                            <div class="{{data.list[1].weather[0].main | formatIconFilter}}"></div>
+                                            <p class="text-center"><small>{{data.list[1].dt | formatDayOfWeekFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[1].dt | formaShortDateFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[1].temp.day | formatTempFilter}} </small></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-4">
+                                        <div class="scale-of-measurement__item, text-center">
+                                            <div class="{{data.list[2].weather[0].main | formatIconFilter}}"></div>
+                                            <p class="text-center"><small>{{data.list[2].dt | formatDayOfWeekFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[2].dt | formaShortDateFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[2].temp.day | formatTempFilter}}</small></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-3">
+                                        <div class="scale-of-measurement__item, text-center">
+                                            <div class="{{data.list[3].weather[0].main | formatIconFilter}}"></div>
+                                            <p class="text-center"><small>{{data.list[3].dt | formatDayOfWeekFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[3].dt | formaShortDateFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[3].temp.day | formatTempFilter}}</small></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-3">
+                                        <div class="scale-of-measurement__item, text-center">
+                                            <div class="{{data.list[4].weather[0].main | formatIconFilter}}"></div>
+                                            <p class="text-center"><small>{{data.list[4].dt | formatDayOfWeekFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[4].dt | formaShortDateFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[4].temp.day | formatTempFilter}}</small></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-3">
+                                        <div class="scale-of-measurement__item, text-center">
+                                            <div class="{{data.list[5].weather[0].main | formatIconFilter}}"></div>
+                                            <p class="text-center"><small>{{data.list[5].dt | formatDayOfWeekFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[5].dt | formaShortDateFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[5].temp.day | formatTempFilter}}</small></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-1 col-md-1 col-sm-1 col-xs-3">
+                                        <div class="scale-of-measurement__item, text-center">
+                                            <div class="{{data.list[6].weather[0].main | formatIconFilter}}"></div>
+                                            <p class="text-center"><small>{{data.list[6].dt | formatDayOfWeekFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[6].dt | formaShortDateFilter}}</small></p>
+                                            <p class="text-center"><small>{{data.list[6].temp.day | formatTempFilter}}</small></p>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-2 col-md-2 col-sm-2 col-xs-0"> </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-1 col-sm-1 col-xs-1"> </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="container" role="main" ng-controller="MainController">
+
+        <!-- Main jumbotron for a primary marketing message or call to action -->
+        <div class="jumbotron">
+            <h1>Your answer: {{answer}}</h1>
+            <p>This is a template showcasing the optional theme stylesheet included in Bootstrap. Use it as a starting point
+                to create something more unique by building on or modifying it.</p>
+        </div>
+
+
+        <div class="page-header">
+            <h1>Buttons</h1>
+        </div>
+        <p>
+            <button type="button" ng-click="setAnswer('May be')" class="btn btn-lg btn-default">May be</button>
+            <button type="button" ng-click="setAnswer('No')" class="btn btn-lg btn-danger">No</button>
+            <button type="button" ng-click="setAnswer('Yes')" class="btn btn-lg btn-success">Yes</button>
+            <button type="button" ng-click="getPosts()" class="btn btn-lg btn-primary">get posts</button>
+        </p>
+
+        <ul ng-if="posts">
+            <li ng-repeat="post in posts">
+                <h2>#{{post.id}}</h2>
+                <div>#{{post.name}}</div>
+            </li>
+        </ul>
+
+    </div> <!-- /container -->
+
+    <script src="bower_components/angular/angular.min.js"></script>
+    <script src="bower_components/angular-resource/angular-resource.min.js"></script>
+    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/d3/d3.min.js" charset="utf-8"></script>
+    <script src="bower_components/c3/c3.min.js"></script>
+    <script src="app/main.js"></script>
+    <script src="assets/js/draw.js"></script>
+    <script src="app/models/PostModel.js"></script>
+    <script src="app/controllers/MainCtrl.js"></script>
 </body>
 </html>
