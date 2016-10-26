@@ -71,7 +71,9 @@
                     <div class="col-lg-2 col-md-1 col-sm-1 col-xs-1"> </div>
                     <div class="col-lg-8 col-md-10 col-sm-10 col-xs-10">
 
-                        <div class="thumbnail" id="chart"></div>
+                        <div class="thumbnail">
+                            <div id="chart"></div>
+                        </div>
 
                     </div>
                     <div class="col-lg-2 col-md-1 col-sm-1 col-xs-1"> </div>
@@ -157,8 +159,6 @@
         <!-- Main jumbotron for a primary marketing message or call to action -->
         <div class="jumbotron">
             <h1>Your answer: {{answer}}</h1>
-            <p>This is a template showcasing the optional theme stylesheet included in Bootstrap. Use it as a starting point
-                to create something more unique by building on or modifying it.</p>
         </div>
 
 
@@ -187,7 +187,6 @@
     <script src="bower_components/d3/d3.min.js" charset="utf-8"></script>
     <script src="bower_components/c3/c3.min.js"></script>
     <script src="app/main.js"></script>
-    <script src="assets/js/draw.js"></script>
     <script src="app/models/PostModel.js"></script>
     <script src="app/controllers/MainCtrl.js"></script>
 </body>

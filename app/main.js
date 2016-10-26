@@ -56,9 +56,98 @@ mainApp.controller('weatherListCtrl', function ($scope, $http) {
     $http.get('app/daily.json').success(function(doc, status, headers, config) {
         $scope.data = doc;
         console.log("DATA IS: ", $scope.data);
+
+        console.log(convertDateForChart($scope.data.list[0].dt));
+
+        //CHART
+        var chart = c3.generate({
+            data: {
+                x: 'x',
+                columns: [
+                    ['x', convertDateForChart($scope.data.list[0].dt),
+                        convertDateForChart($scope.data.list[1].dt),
+                        convertDateForChart($scope.data.list[2].dt),
+                        convertDateForChart($scope.data.list[3].dt),
+                        convertDateForChart($scope.data.list[4].dt),
+                        convertDateForChart($scope.data.list[5].dt),
+                        convertDateForChart($scope.data.list[6].dt)],
+                    ['Температура', $scope.data.list[0].temp.day, $scope.data.list[1].temp.day,
+                        $scope.data.list[2].temp.day, $scope.data.list[3].temp.day,
+                        $scope.data.list[4].temp.day, $scope.data.list[5].temp.day,
+                        $scope.data.list[6].temp.day],
+                ],
+                types: {
+                    "Температура": 'area'
+                }
+            },
+            axis: {
+                x: {
+                    type: 'timeseries',
+                    tick: {
+                        format: '%d.%m'
+                        //'%d.%m.%Y'
+                    }
+                }
+            }
+        });
+
     });
 
 });
+
+//for chart
+function convertDateForChart(value) {
+
+        var theDate = new Date(value * 1000);
+        dateString = theDate.toGMTString();
+
+        str = dateString.substr(12, 4) + "-";
+
+        switch (dateString.substr(8, 3)) {
+            case "Jan":
+                str = str + "01-";
+                break;
+            case "Feb":
+                str = str + "02-";
+                break;
+            case "Mar":
+                str = str + "03-";
+                break;
+            case "Apr":
+                str = str + "04-";
+                break;
+            case "May":
+                str = str + "05-";
+                break;
+            case "Jun":
+                str = str + "06-";
+                break;
+            case "Jul":
+                str = str + "07-";
+                break;
+            case "Aug":
+                str = str + "08-";
+                break;
+            case "Sep":
+                str = str + "09-";
+                break;
+            case "Oct":
+                str = str + "10-";
+                break;
+            case "Nov":
+                str = str + "11-";
+                break;
+            case "Dec":
+                str = str + "12-";
+                break;
+        }
+
+        str = str + dateString.substr(5, 2);
+        console.log(str);
+
+        return str;
+};
+
 
 //FILTER for HTML
 mainApp.filter('formatIconFilter', function(){
@@ -149,26 +238,3 @@ mainApp.filter('formatTempFilter', function(){
         return value + "°C";
     }
 });
-
-//CHART
-/*
-var chart = c3.generate({
-    data: {
-        x: 'x',
-//        xFormat: '%Y%m%d', // 'xFormat' can be used as custom format of 'x'
-        columns: [
-            ['x', '2013-01-01', '2013-01-02', '2013-01-03', '2013-01-04', '2013-01-05', '2013-01-06'],
-//            ['x', '20130101', '20130102', '20130103', '20130104', '20130105', '20130106'],
-            ['data1', 30, 200, 100, 400, 150, 250],
-            ['data2', 130, 340, 200, 500, 250, 350]
-        ]
-    },
-    axis: {
-        x: {
-            type: 'timeseries',
-            tick: {
-                format: '%d.%m.%Y'
-            }
-        }
-    }
-});*/
