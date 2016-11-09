@@ -9,6 +9,7 @@
     <base href="/"/>
 
     <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/bootstrap-select/dist/css/bootstrap-select.min.css">
     <link rel="stylesheet" href="bower_components/c3/c3.css">
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/webfont/Fontsaddict.css">
@@ -29,8 +30,7 @@
                     <div class="input-group" ng-hide="toHide">
                         <input type="text" class="form-control" placeholder="Назва міста..." ng-model="cityName">
                         <div class="input-group-btn">
-                            <button ng-click="" class="btn btn-primary" type="button">Пошук!</button>
-                            #include virtual="file.php"
+                            <button ng-click="weatherInfo = !weatherInfo" class="btn btn-primary" type="button">Пошук!</button>
                         </div>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
         <div style="height: 20px"></div>
 
         <!--Прогноз (зображення і текст)-->
-        <div name="weatherInfo">
+        <div <!--ng-show="weatherInfo"-->>
             <div class="row padded" ng-hide="toHide">
                 <div ng-controller="weatherCurrentItemCtrl">
                     <div class="col-lg-2 col-md-1 col-sm-1 col-xs-1"> </div>
@@ -150,39 +150,58 @@
                     </div>
                     <div class="col-lg-2 col-md-1 col-sm-1 col-xs-1"> </div>
                 </div>
+
             </div>
         </div>
+
+        <!-- DB -->
+        <div ng-controller="dBCtrl" class="row padded">
+            <div class="col-lg-3 col-md-2 col-sm-2 col-xs-1"> </div>
+            <div class="col-lg-6 col-md-8 col-sm-8 col-xs-10">
+                <div class="sample-show-hide" ng-show="showOperationWithDB">
+                    <div class="thumbnail">
+                        <h3 class="text-center">Операції з базою даних</h3>
+
+                        <h5 class="text-center">Вивести запит:</h5>
+
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1"> </div>
+                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-10">
+                            <div class="input-group">
+                                <input type="text" class="form-control" placeholder="Назва міста...">
+                                <div class="input-group-btn">
+                                    <button class="btn btn-primary" type="button">Показати</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1"> </div>
+
+                        <h5 class="text-center">Записати даний запит:</h5>
+                        <button class="btn btn-primary" type="button">Зберегти</button>
+                    </div>
+                </div>
+                <button style="text-align: center" ng-click="showOperationWithDB = !showOperationWithDB; changeButtonName()" class="btn btn-primary" type="button">{{buttonName}}</button>
+            </div>
+            <div class="col-lg-3 col-md-2 col-sm-2 col-xs-1"> </div>
+        </div>
+
     </div>
 
-    <div class="container" role="main" ng-controller="MainController">
-
-        <!-- Main jumbotron for a primary marketing message or call to action -->
-        <div class="jumbotron">
-            <h1>Your answer: {{answer}}</h1>
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <!-- ROUTES -->
+            <ul class="nav navbar-nav">
+                <li><a href="#demo">Link</a></li>
+                <li><a href="#chart">Link</a></li>
+            </ul>
         </div>
+    </nav>
 
-
-        <div class="page-header">
-            <h1>Buttons</h1>
-        </div>
-        <p>
-            <button type="button" ng-click="setAnswer('May be')" class="btn btn-lg btn-default">May be</button>
-            <button type="button" ng-click="setAnswer('No')" class="btn btn-lg btn-danger">No</button>
-            <button type="button" ng-click="setAnswer('Yes')" class="btn btn-lg btn-success">Yes</button>
-            <button type="button" ng-click="getPosts()" class="btn btn-lg btn-primary">get posts</button>
-        </p>
-
-        <ul ng-if="posts">
-            <li ng-repeat="post in posts">
-                <h2>#{{post.id}}</h2>
-                <div>#{{post.name}}</div>
-            </li>
-        </ul>
-
-    </div> <!-- /container -->
+<ng-view></ng-view>
 
     <script src="bower_components/angular/angular.min.js"></script>
     <script src="bower_components/angular-resource/angular-resource.min.js"></script>
+    <script src="bower_components/angular-route/angular-route.min.js"></script>
+    <script src="bower_components/angular-animate/angular-animate.js"></script>
     <script src="bower_components/jquery/dist/jquery.js"></script>
     <script src="bower_components/d3/d3.min.js" charset="utf-8"></script>
     <script src="bower_components/c3/c3.min.js"></script>

@@ -1,17 +1,30 @@
-var mainApp = angular.module('MainApp', ['ngResource']);
+var mainApp = angular.module('MainApp', ['ngRoute', 'ngResource']);
+
+///ROUTES
+
+mainApp.config(['$routeProvider', function ($routeProvider){
+    $routeProvider
+        .when('/demo', {
+            templateUrl: 'index2.html'
+            //controller: 'MainController'
+        })
+        .when('/chart', {
+            templateUrl: 'index3.html',
+            controller: 'weatherListCtrl'
+        })
+        .otherwise({
+            redirectTo: '/'
+        });
+}]);
+
 
 mainApp.factory('PostModel', ['$resource', function ($resource) {
-    return $resource('http://localhost:8000/api/rest.php/posts/:id', {'id': '@id'}, {});
+    return $resource('http://localhost:8088/api/rest.php/test/', {});
+    //                                                   posts
 }]);
 
 
 mainApp.controller('MainController', ['$scope', 'PostModel', function ($scope, PostModel) {
-    $scope.answer = ' - ';
-
-    $scope.setAnswer = function (answer) {
-        $scope.answer = answer;
-    };
-
     $scope.getPosts = function (answer) {
         PostModel.get(function(res) {
             console.log('res', res.data);
@@ -19,6 +32,18 @@ mainApp.controller('MainController', ['$scope', 'PostModel', function ($scope, P
         });
     };
 }]);
+
+mainApp.controller('dBCtrl', function ($scope, $http) {
+
+    $scope.buttonName = "Показати інструменти для роботи з базою даних";
+
+    $scope.changeButtonName = function () {
+        if($scope.buttonName == "Показати інструменти для роботи з базою даних")
+            $scope.buttonName = "Приховати інструменти для роботи з базою даних";
+        else
+            $scope.buttonName = "Показати інструменти для роботи з базою даних";
+        };
+});
 
 mainApp.controller('weatherCurrentItemCtrl', function ($scope, $http) {
     $http.get('app/now.json').success(function(doc, status, headers, config) {
@@ -50,50 +75,6 @@ mainApp.filter('formatLargeIconFilter', function(){
     }
 });
 
-
-//CONTROLLER
-mainApp.controller('weatherListCtrl', function ($scope, $http) {
-    $http.get('app/daily.json').success(function(doc, status, headers, config) {
-        $scope.data = doc;
-        console.log("DATA IS: ", $scope.data);
-
-        console.log(convertDateForChart($scope.data.list[0].dt));
-
-        //CHART
-        var chart = c3.generate({
-            data: {
-                x: 'x',
-                columns: [
-                    ['x', convertDateForChart($scope.data.list[0].dt),
-                        convertDateForChart($scope.data.list[1].dt),
-                        convertDateForChart($scope.data.list[2].dt),
-                        convertDateForChart($scope.data.list[3].dt),
-                        convertDateForChart($scope.data.list[4].dt),
-                        convertDateForChart($scope.data.list[5].dt),
-                        convertDateForChart($scope.data.list[6].dt)],
-                    ['Температура', $scope.data.list[0].temp.day, $scope.data.list[1].temp.day,
-                        $scope.data.list[2].temp.day, $scope.data.list[3].temp.day,
-                        $scope.data.list[4].temp.day, $scope.data.list[5].temp.day,
-                        $scope.data.list[6].temp.day],
-                ],
-                types: {
-                    "Температура": 'area'
-                }
-            },
-            axis: {
-                x: {
-                    type: 'timeseries',
-                    tick: {
-                        format: '%d.%m'
-                        //'%d.%m.%Y'
-                    }
-                }
-            }
-        });
-
-    });
-
-});
 
 //for chart
 function convertDateForChart(value) {
@@ -148,7 +129,6 @@ function convertDateForChart(value) {
         return str;
 };
 
-
 //FILTER for HTML
 mainApp.filter('formatIconFilter', function(){
     return function(value) {
@@ -168,6 +148,51 @@ mainApp.filter('formatIconFilter', function(){
                 return "icon-small";
         }
     }
+});
+
+
+//CONTROLLER
+mainApp.controller('weatherListCtrl', function ($scope, $http) {
+    $http.get('app/daily.json').success(function(doc, status, headers, config) {
+
+        $scope.data = doc;
+        console.log("DATA IS: ", $scope.data);
+        console.log(convertDateForChart($scope.data.list[0].dt));
+
+        //CHART
+        var chart = c3.generate({
+            data: {
+                x: 'x',
+                columns: [
+                    ['x', convertDateForChart($scope.data.list[0].dt),
+                        convertDateForChart($scope.data.list[1].dt),
+                        convertDateForChart($scope.data.list[2].dt),
+                        convertDateForChart($scope.data.list[3].dt),
+                        convertDateForChart($scope.data.list[4].dt),
+                        convertDateForChart($scope.data.list[5].dt),
+                        convertDateForChart($scope.data.list[6].dt)],
+                    ['Температура', $scope.data.list[0].temp.day, $scope.data.list[1].temp.day,
+                        $scope.data.list[2].temp.day, $scope.data.list[3].temp.day,
+                        $scope.data.list[4].temp.day, $scope.data.list[5].temp.day,
+                        $scope.data.list[6].temp.day],
+                ],
+                types: {
+                    "Температура": 'area'
+                }
+            },
+            axis: {
+                x: {
+                    type: 'timeseries',
+                    tick: {
+                        format: '%d.%m'
+                        //'%d.%m.%Y'
+                    }
+                }
+            }
+        });
+
+    });
+
 });
 
 mainApp.filter('formaShortDateFilter', function(){
