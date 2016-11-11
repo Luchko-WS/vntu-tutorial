@@ -21,31 +21,14 @@ $app->add(function ($req, $res, $next) {
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 });
 
-$app->get('/posts', function (Request $request, Response $response) {
-    $response->getBody()->write(json_encode([
-        'data' => [
-            [
-                'id' => 1,
-                'name' => 'foo'
-            ],
-            [
-                'id' => 2,
-                'name' => 'bar'
-            ]
-        ]
-    ]));
+$app->get('/get', function (Request $request, Response $response) {
+    $rows = DB::fetchAll('SELECT c.id, c.city, w.date, w.dayOfWeek, w.weather, w.temp FROM cities AS c RIGHT JOIN weather AS w ON (c.id=w.id)');
+    $response->getBody()->write('{"data":'.json_encode($rows).'}');
     return $response;
 });
 
-$app->get('/posts/{id}', function (Request $request, Response $response) {
-//    $name = $request->getAttribute('name');
-    $response->getBody()->write("{}");
-
-    return $response;
-});
-
-$app->get('/test', function (Request $request, Response $response) {
-    $rows = DB::fetchAll('SELECT * FROM `weather`');
+$app->get('/get/[{city}]', function ($request, $response, $args) {
+    $rows = DB::fetchAll("SELECT c.id, c.city, w.date, w.dayOfWeek, w.weather, w.temp FROM cities AS c RIGHT JOIN weather AS w ON (c.id=w.id) WHERE city = ".args['city'].";");
     $response->getBody()->write('{"data":'.json_encode($rows).'}');
     return $response;
 });

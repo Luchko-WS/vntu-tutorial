@@ -8,9 +8,12 @@ mainApp.config(['$routeProvider', function ($routeProvider){
             templateUrl: 'index2.html'
             //controller: 'MainController'
         })
-        .when('/chart', {
-            templateUrl: 'index3.html',
-            controller: 'weatherListCtrl'
+        .when('/showFromDB', {
+            templateUrl: 'showFromDB.html',
+            controller: ''
+        })
+        .when('/forecast', {
+            templateUrl: 'forecast.html'
         })
         .otherwise({
             redirectTo: '/'
@@ -19,15 +22,14 @@ mainApp.config(['$routeProvider', function ($routeProvider){
 
 
 mainApp.factory('PostModel', ['$resource', function ($resource) {
-    return $resource('http://localhost:8088/api/rest.php/test/', {});
-    //                                                   posts
+    return $resource('http://localhost:8088/api/rest.php/get/:city',
+        {'city': '@city'});
 }]);
 
 
 mainApp.controller('MainController', ['$scope', 'PostModel', function ($scope, PostModel) {
-    $scope.getPosts = function (answer) {
+    $scope.getPosts = function (value) {
         PostModel.get(function(res) {
-            console.log('res', res.data);
             $scope.posts = res.data;
         });
     };
@@ -35,20 +37,19 @@ mainApp.controller('MainController', ['$scope', 'PostModel', function ($scope, P
 
 mainApp.controller('dBCtrl', function ($scope, $http) {
 
-    $scope.buttonName = "Показати інструменти для роботи з базою даних";
+    $scope.buttonName = "Показати інструменти";
 
     $scope.changeButtonName = function () {
-        if($scope.buttonName == "Показати інструменти для роботи з базою даних")
-            $scope.buttonName = "Приховати інструменти для роботи з базою даних";
+        if($scope.buttonName == "Показати інструменти")
+            $scope.buttonName = "Приховати інструменти";
         else
-            $scope.buttonName = "Показати інструменти для роботи з базою даних";
+            $scope.buttonName = "Показати інструменти";
         };
 });
 
 mainApp.controller('weatherCurrentItemCtrl', function ($scope, $http) {
     $http.get('app/now.json').success(function(doc, status, headers, config) {
         $scope.data = doc;
-        console.log("DATA IS: ", $scope.data);
     });
 });
 

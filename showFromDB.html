@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="bower_components/bootstrap-select/dist/css/bootstrap-select.min.css">
+    <link rel="stylesheet" href="bower_components/c3/c3.css">
+    <link rel="stylesheet" href="assets/css/main.css">
+    <link rel="stylesheet" href="assets/webfont/Fontsaddict.css">
+
+</head>
+<body>
+
+    <div ng-controller="MainController" class="container">
+        <div ng-init="getPosts()"></div>
+            <div ng-if="posts">
+                <div ng-repeat="post in posts">
+                    <div class="col-sm-6 col-md-6">
+                        <div class="thumbnail">
+                            <div class="row padded">
+                                <div class="col-lg-5 col-md-4 col-sm-4 col-xs-4">
+                                    <img ng-src="{{post.weather | formatLargeIconFilter}}" width="100px" heidht ="100px" class="img-rounded">
+                                </div>
+                                <div class="col-lg-7 col-md-8 col-sm-8 col-xs-8">
+                                    <h4>Місто: {{post.city}}</h4>
+                                    <h5>День тижня: {{post.dayOfWeek}}</h5>
+                                    <h5>Дата: {{post.date}}</h5>
+                                    <h5>Температура: {{post.temp}}°C</h5>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="center-block" ng-if="!posts">
+                <div class="col-lg-3 col-md-2 col-sm-2 col-md-2"></div>
+                <div class="col-lg-6 col-md-8 col-sm-8 col-md-8">
+                    <div class="thumbnail">
+                        <div class="row padded">
+                            <div class="col-lg-5 col-md-4 col-sm-4 col-xs-5">
+                                <img src="assets/img/oops.jpg" width="120px" heidht ="120px" class="img-rounded">
+                            </div>
+                            <div class="col-lg-7 col-md-8 col-sm-8 col-xs-7">
+                                <p>На жаль, по даному запиту нічого не знайдено.</p>
+                                <p>Спробуйте ввести інші критерії пошуку.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-3 col-md-2 col-sm-2 col-md-2"></div>
+            </div>
+        </div>
+    </div>
+
+<script src="bower_components/angular/angular.min.js"></script>
+<script src="bower_components/angular-resource/angular-resource.min.js"></script>
+<script src="bower_components/angular-route/angular-route.min.js"></script>
+<script src="bower_components/angular-animate/angular-animate.js"></script>
+<script src="bower_components/jquery/dist/jquery.js"></script>
+<script src="bower_components/d3/d3.min.js" charset="utf-8"></script>
+<script src="bower_components/c3/c3.min.js"></script>
+<script src="app/main.js"></script>
+<script src="app/models/PostModel.js"></script>
+<script src="app/controllers/MainCtrl.js"></script>
+</body>
+</html>
