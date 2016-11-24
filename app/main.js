@@ -1,5 +1,11 @@
 var mainApp = angular.module('MainApp', ['ngRoute', 'ngResource']);
 
+Parameters = {
+    cityName: "Detroit",
+    minDate : "01-01-2016",
+    maxDate : "01-01-2017"
+};
+
 ///ROUTES
 
 mainApp.config(['$routeProvider', function ($routeProvider){
@@ -20,12 +26,14 @@ mainApp.config(['$routeProvider', function ($routeProvider){
         });
 }]);
 
+//FACTORY
 
 mainApp.factory('PostModel', ['$resource', function ($resource) {
     return $resource('http://localhost:8088/api/rest.php/get/:city',
         {'city': '@city'});
 }]);
 
+//CONTROLLERS
 
 mainApp.controller('MainController', ['$scope', 'PostModel', function ($scope, PostModel) {
     $scope.getPosts = function (value) {
@@ -35,7 +43,7 @@ mainApp.controller('MainController', ['$scope', 'PostModel', function ($scope, P
     };
 }]);
 
-mainApp.controller('dBCtrl', function ($scope, $http) {
+mainApp.controller('DataBaseCtrl', function ($scope, $http) {
 
     $scope.buttonName = "Показати інструменти";
 
@@ -45,6 +53,39 @@ mainApp.controller('dBCtrl', function ($scope, $http) {
         else
             $scope.buttonName = "Показати інструменти";
         };
+
+    $scope.set = function (cityName, minDate, maxDate) {
+        /*
+        if(minDate != null)
+            Parameters.minDate = minDate;
+        if(maxDate != null)
+            Parameters.maxDate = maxDate;
+        */
+
+        Parameters.cityName = cityName;
+        console.log(cityName + ": From " + convertDateForChart(Parameters.minDate/1000) + " to " + convertDateForChart(Parameters.maxDate/1000));
+    };
+
+    $(function () {
+        //Инициализация datetimepickerMin и datetimepickerMax
+        $("#datetimepickerMin").datetimepicker(
+            {pickTime: false, language: 'ru'}
+        );
+        $("#datetimepickerMax").datetimepicker(
+            {pickTime: false, language: 'ru'}
+        );
+        //При изменении даты в min datetimepicker, она устанавливается как минимальная для max datetimepicker
+        $("#datetimepickerMin").on("dp.change",function (e) {
+            Parameters.minDate = e.date;
+            $("#datetimepickerMax").data("DateTimePicker").setMinDate(e.date);
+        });
+        //При изменении даты в max datetimepicker, она устанавливается как максимальная для min datetimepicker
+        $("#datetimepickerMax").on("dp.change",function (e) {
+            Parameters.maxDate = e.date;
+            $("#datetimepickerMin").data("DateTimePicker").setMaxDate(e.date);
+        });
+    });
+
 });
 
 mainApp.controller('weatherCurrentItemCtrl', function ($scope, $http) {
@@ -53,7 +94,49 @@ mainApp.controller('weatherCurrentItemCtrl', function ($scope, $http) {
     });
 });
 
+mainApp.controller('weatherListCtrl', function ($scope, $http) {
+    $http.get('app/daily.json').success(function(doc, status, headers, config) {
+
+        $scope.data = doc;
+
+        //CHART
+        var chart = c3.generate({
+            data: {
+                x: 'x',
+                columns: [
+                    ['x', convertDateForChart($scope.data.list[0].dt),
+                        convertDateForChart($scope.data.list[1].dt),
+                        convertDateForChart($scope.data.list[2].dt),
+                        convertDateForChart($scope.data.list[3].dt),
+                        convertDateForChart($scope.data.list[4].dt),
+                        convertDateForChart($scope.data.list[5].dt),
+                        convertDateForChart($scope.data.list[6].dt)],
+                    ['Температура', $scope.data.list[0].temp.day, $scope.data.list[1].temp.day,
+                        $scope.data.list[2].temp.day, $scope.data.list[3].temp.day,
+                        $scope.data.list[4].temp.day, $scope.data.list[5].temp.day,
+                        $scope.data.list[6].temp.day],
+                ],
+                types: {
+                    "Температура": 'area'
+                }
+            },
+            axis: {
+                x: {
+                    type: 'timeseries',
+                    tick: {
+                        format: '%d.%m'
+                        //'%d.%m.%Y'
+                    }
+                }
+            }
+        });
+
+    });
+
+});
+
 //FILTER for HTML
+
 mainApp.filter('formatLargeIconFilter', function(){
     return function(value) {
         switch (value) {
@@ -125,7 +208,6 @@ function convertDateForChart(value) {
         }
 
         str = str + dateString.substr(5, 2);
-        console.log(str);
 
         return str;
 };
@@ -149,51 +231,6 @@ mainApp.filter('formatIconFilter', function(){
                 return "icon-small";
         }
     }
-});
-
-
-//CONTROLLER
-mainApp.controller('weatherListCtrl', function ($scope, $http) {
-    $http.get('app/daily.json').success(function(doc, status, headers, config) {
-
-        $scope.data = doc;
-        console.log("DATA IS: ", $scope.data);
-        console.log(convertDateForChart($scope.data.list[0].dt));
-
-        //CHART
-        var chart = c3.generate({
-            data: {
-                x: 'x',
-                columns: [
-                    ['x', convertDateForChart($scope.data.list[0].dt),
-                        convertDateForChart($scope.data.list[1].dt),
-                        convertDateForChart($scope.data.list[2].dt),
-                        convertDateForChart($scope.data.list[3].dt),
-                        convertDateForChart($scope.data.list[4].dt),
-                        convertDateForChart($scope.data.list[5].dt),
-                        convertDateForChart($scope.data.list[6].dt)],
-                    ['Температура', $scope.data.list[0].temp.day, $scope.data.list[1].temp.day,
-                        $scope.data.list[2].temp.day, $scope.data.list[3].temp.day,
-                        $scope.data.list[4].temp.day, $scope.data.list[5].temp.day,
-                        $scope.data.list[6].temp.day],
-                ],
-                types: {
-                    "Температура": 'area'
-                }
-            },
-            axis: {
-                x: {
-                    type: 'timeseries',
-                    tick: {
-                        format: '%d.%m'
-                        //'%d.%m.%Y'
-                    }
-                }
-            }
-        });
-
-    });
-
 });
 
 mainApp.filter('formaShortDateFilter', function(){

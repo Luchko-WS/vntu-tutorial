@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="bower_components/c3/c3.css">
     <link rel="stylesheet" href="assets/css/main.css">
     <link rel="stylesheet" href="assets/webfont/Fontsaddict.css">
+    <link rel="stylesheet" href="bower_components/bootstrap/dist/css/bootstrap-datetimepicker.min.css"/>
 
 </head>
 <body ng-app="MainApp" background="assets/img/background.jpg">
@@ -26,12 +27,10 @@
         <div class="row padded">
             <div class="col-lg-2 col-md-1 col-sm-1 col-xs-1"> </div>
             <div class="col-lg-8 col-md-10 col-sm-10 col-xs-10">
-                <div class="block2">
-                    <div class="input-group" ng-hide="toHide">
-                        <input type="text" class="form-control" placeholder="Назва міста..." ng-model="cityName">
-                        <div class="input-group-btn">
-                            <a href="#forecast"><button ng-click="" class="btn btn-primary" type="button">Пошук!</button></a>
-                        </div>
+                <div class="input-group" ng-hide="toHide">
+                    <input type="text" class="form-control" placeholder="Назва міста..." ng-model="cityName">
+                    <div class="input-group-btn">
+                        <a href="#forecast"><button ng-click="" class="btn btn-primary" type="button">Пошук!</button></a>
                     </div>
                 </div>
             </div>
@@ -45,7 +44,7 @@
         <ng-view></ng-view>
 
         <!-- DB -->
-        <div ng-controller="dBCtrl" class="row padded">
+        <div ng-controller="DataBaseCtrl" class="row padded">
             <div class="col-lg-3 col-md-2 col-sm-2 col-xs-1"> </div>
             <div class="col-lg-6 col-md-8 col-sm-8 col-xs-10">
                 <div class="sample-show-hide" ng-show="showOperationWithDB">
@@ -55,16 +54,42 @@
                         <h5 class="text-center">Вивести запит:</h5>
                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-0"> </div>
                         <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
+
+                            <div class="row">
+                                <div class="col-sm-6 col-xs-12">
+                                    <div class="form-group">
+                                        <div class="input-group date" id="datetimepickerMin">
+                                            <input type="text" data-ng-model="minDate" class="form-control" placeholder="Початкова дата...">
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-sm-6 col-xs-12">
+                                    <div class="form-group">
+                                        <div class="input-group date" id="datetimepickerMax">
+                                            <input type="text" data-ng-model="maxDate" class="form-control" placeholder="Кінцева дата...">
+                                            <span class="input-group-addon">
+                                                <span class="glyphicon glyphicon-calendar"></span>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <div class="input-group">
-                                <input type="text" class="form-control" placeholder="Назва міста...">
-                                <div class="input-group-btn" ng-model="parameters">
-                                    <a href="#showFromDB"><button class="btn btn-primary" type="button">Показати</button></a>
+                                <input type="text" class="form-control" ng-model="cityName" placeholder="Назва міста...">
+                                <div class="input-group-btn">
+                                    <a href="#showFromDB">
+                                        <button ng-click="set(cityName, minDate, maxDate)" class="btn btn-primary" type="button">Показати</button>
+                                    </a>
                                 </div>
                             </div>
                         </div>
                         <div class="col-lg-1 col-md-1 col-sm-1 col-xs-0"> </div>
 
-                        <div style="height: 40px"></div>
+                        <div style="height: 80px"></div>
 
                         <h5 class="text-center">Записати даний запит:</h5>
                         <button class="btn btn-primary center-block" type="button">Зберегти</button>
@@ -82,11 +107,12 @@
     <script src="bower_components/angular-resource/angular-resource.min.js"></script>
     <script src="bower_components/angular-route/angular-route.min.js"></script>
     <script src="bower_components/angular-animate/angular-animate.js"></script>
-    <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/jquery/dist/jquery-1.11.1.min.js"></script>
+    <script src="bower_components/moment-with-locales.min.js"></script>
+
+    <script src="bower_components/bootstrap/dist/js/bootstrap-datetimepicker.min.js"></script>
     <script src="bower_components/d3/d3.min.js" charset="utf-8"></script>
     <script src="bower_components/c3/c3.min.js"></script>
     <script src="app/main.js"></script>
-    <script src="app/models/PostModel.js"></script>
-    <script src="app/controllers/MainCtrl.js"></script>
 </body>
 </html>
