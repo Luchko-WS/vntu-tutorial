@@ -21,16 +21,16 @@ $app->add(function ($req, $res, $next) {
         ->withHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
 });
 
-$app->get('/get', function (Request $request, Response $response) {
+$app->get('/posts', function (Request $request, Response $response) {
     $rows = DB::fetchAll('SELECT c.id, c.city, w.date, w.dayOfWeek, w.weather, w.temp FROM cities AS c RIGHT JOIN weather AS w ON (c.id=w.id)');
     $response->getBody()->write('{"data":'.json_encode($rows).'}');
     return $response;
 });
-
+/*
 $app->get('/get/[{city}]', function ($request, $response, $args) {
-    $rows = DB::fetchAll("SELECT c.id, c.city, w.date, w.dayOfWeek, w.weather, w.temp FROM cities AS c RIGHT JOIN weather AS w ON (c.id=w.id) WHERE city = ".args['city'].";");
+    $rows = DB::fetchAll("SELECT c.id, c.city, w.date, w.dayOfWeek, w.weather, w.temp FROM cities AS c RIGHT JOIN weather AS w ON (c.id=w.id) WHERE city = ".$args['city'].";");
     $response->getBody()->write('{"data":'.json_encode($rows).'}');
     return $response;
 });
-
+*/
 $app->run();

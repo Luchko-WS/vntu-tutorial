@@ -26,21 +26,22 @@ mainApp.config(['$routeProvider', function ($routeProvider){
         });
 }]);
 
+
 //FACTORY
 
 mainApp.factory('PostModel', ['$resource', function ($resource) {
-    return $resource('http://localhost:8088/api/rest.php/get/:city',
-        {'city': '@city'});
+    return $resource('http://localhost:8088/api/rest.php/posts/:city');
 }]);
+
 
 //CONTROLLERS
 
 mainApp.controller('MainController', ['$scope', 'PostModel', function ($scope, PostModel) {
-    $scope.getPosts = function (value) {
-        PostModel.get(function(res) {
+    $scope.getAll = function () {
+        PostModel.get(function (res) {
             $scope.posts = res.data;
         });
-    };
+    }
 }]);
 
 mainApp.controller('DataBaseCtrl', function ($scope, $http) {
