@@ -1,10 +1,13 @@
 var mainApp = angular.module('MainApp', ['ngRoute', 'ngResource']);
 
-Parameters = {
-    cityName: "Detroit",
+var Parameters = {
+    cityName: "NONE NONE NONE",
     minDate : "01-01-2016",
     maxDate : "01-01-2017"
 };
+
+var DataFromDB = {};
+
 
 ///ROUTES
 
@@ -30,21 +33,31 @@ mainApp.config(['$routeProvider', function ($routeProvider){
 //FACTORY
 
 mainApp.factory('PostModel', ['$resource', function ($resource) {
-    return $resource('http://localhost:8088/api/rest.php/posts/:city');
+ return $resource('http://localhost:8088/api/rest.php/posts/:city,:minDate,:maxDate', {'city':'@city'}, {'minDate':'@minDate'}, {'maxDate':'@maxDate'}, {});
+ }]);
+
+//test
+mainApp.factory('RequestModel', ['$resource', function ($resource) {
+    return $resource('http://localhost:8088/api/rest.php/sendRequest/:city', {'city':'@city'}, {});
 }]);
 
 
 //CONTROLLERS
 
-mainApp.controller('MainController', ['$scope', 'PostModel', function ($scope, PostModel) {
-    $scope.getAll = function () {
-        PostModel.get(function (res) {
-            $scope.posts = res.data;
+//test
+mainApp.controller('RequestCtrl', ['$scope', 'RequestModel', function ($scope, RequestModel) {
+
+    $scope.cityName = "";
+
+    $scope.getData = function () {
+        RequestModel.get({'city':$scope.cityName}, function (res) {
+            $scope.data = res.data;
         });
-    }
+    };
 }]);
 
-mainApp.controller('DataBaseCtrl', function ($scope, $http) {
+
+mainApp.controller('DataBaseCtrl', ['$scope', 'PostModel', function ($scope, PostModel) {
 
     $scope.buttonName = "Показати інструменти";
 
@@ -55,16 +68,21 @@ mainApp.controller('DataBaseCtrl', function ($scope, $http) {
             $scope.buttonName = "Показати інструменти";
         };
 
-    $scope.set = function (cityName, minDate, maxDate) {
-        /*
-        if(minDate != null)
-            Parameters.minDate = minDate;
-        if(maxDate != null)
-            Parameters.maxDate = maxDate;
-        */
-
+    $scope.setParameters = function (cityName) {
         Parameters.cityName = cityName;
-        console.log(cityName + ": From " + convertDateForChart(Parameters.minDate/1000) + " to " + convertDateForChart(Parameters.maxDate/1000));
+        Parameters.minDate = convertDateForChart(Parameters.minDate/1000);
+        Parameters.maxDate = convertDateForChart(Parameters.maxDate/1000);
+        console.log(Parameters.cityName + ": From " + Parameters.minDate + " to " + Parameters.maxDate);
+    };
+
+    $scope.getData = function () {
+        PostModel.get({'city':Parameters.cityName,'minDate':Parameters.minDate,'maxDate':Parameters.maxDate}, function (res) {
+            DataFromDB = res.data;
+        });
+    };
+
+    $scope.returnData = function() {
+        return DataFromDB;
     };
 
     $(function () {
@@ -87,18 +105,13 @@ mainApp.controller('DataBaseCtrl', function ($scope, $http) {
         });
     });
 
-});
-
-mainApp.controller('weatherCurrentItemCtrl', function ($scope, $http) {
-    $http.get('app/now.json').success(function(doc, status, headers, config) {
-        $scope.data = doc;
-    });
-});
+}]);
 
 mainApp.controller('weatherListCtrl', function ($scope, $http) {
-    $http.get('app/daily.json').success(function(doc, status, headers, config) {
+    $http.get('api/forecast.json').success(function(doc, status, headers, config) {
 
         $scope.data = doc;
+        console.log($scope.data);
 
         //CHART
         var chart = c3.generate({
@@ -141,11 +154,13 @@ mainApp.controller('weatherListCtrl', function ($scope, $http) {
 mainApp.filter('formatLargeIconFilter', function(){
     return function(value) {
         switch (value) {
+            case "Clear":
+                return "assets/img/sun.jpg";
             case "Sun":
                 return "assets/img/sun.jpg";
             case "Rain":
                 return "assets/img/rain.jpg";
-            case  "Snow":
+            case "Snow":
                 return "assets/img/snow.jpg";
             case "Extreme":
                 return "assets/img/extreme.jpg";
