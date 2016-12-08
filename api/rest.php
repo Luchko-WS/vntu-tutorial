@@ -37,15 +37,10 @@ $app->get('/params/{city},{minDate},{maxDate}', function (Request $request, Resp
 $app->get('/sendRequest/{city}', function (Request $request, Response $response, $args) {
     header('Content-Type: text/html;charset=UTF-8');
 
-    $city = $args['city']; // город. Можно и по-русски написать, например: Брянск
-    // формируем урл для запроса
+    $city = $args['city'];
     $url = "http://api.openweathermap.org/data/2.5/forecast/daily?q=".$args['city']."&units=metric&cnt=7&APPID=531d4a54f4acb25f72b62eab815bc362";
-    // делаем запрос к апи
     $data = @file_get_contents($url);
-    // получили данные
-    //file_put_contents('forecast.json', $data);
     $response = '{"data":'.$data.'}';
-    //file_put_contents('out.txt', $response);
     return $response;
 });
 

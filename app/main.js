@@ -7,7 +7,7 @@ var Parameters = {
 };
 
 var DataFromDB = {};
-var DataFromAPI = {};
+var DataFromAPI = "undefined";
 
 ///ROUTES
 
@@ -51,15 +51,49 @@ mainApp.controller('RequestCtrl', ['$scope', 'RequestModel', function ($scope, R
     $scope.cityName = "";
 
     $scope.getData = function () {
+
+        DataFromAPI = "undefined";
+
         RequestModel.get({'city':$scope.cityName}, function (res) {
             DataFromAPI = res.data;
+
+            var chart = c3.generate({
+                data: {
+                    x: 'x',
+                    columns: [
+                        ['x', convertDateForChart(DataFromAPI.list[0].dt),
+                            convertDateForChart(DataFromAPI.list[1].dt),
+                            convertDateForChart(DataFromAPI.list[2].dt),
+                            convertDateForChart(DataFromAPI.list[3].dt),
+                            convertDateForChart(DataFromAPI.list[4].dt),
+                            convertDateForChart(DataFromAPI.list[5].dt),
+                            convertDateForChart(DataFromAPI.list[6].dt)],
+                        ['Температура', DataFromAPI.list[0].temp.day, DataFromAPI.list[1].temp.day,
+                            DataFromAPI.list[2].temp.day, DataFromAPI.list[3].temp.day,
+                            DataFromAPI.list[4].temp.day, DataFromAPI.list[5].temp.day,
+                            DataFromAPI.list[6].temp.day],
+                    ],
+                    types: {
+                        "Температура": 'area'
+                    }
+                },
+                axis: {
+                    x: {
+                        type: 'timeseries',
+                        tick: {
+                            format: '%d.%m'
+                            //'%d.%m.%Y'
+                        }
+                    }
+                }
+            });
+
         });
     };
 
     $scope.returnData = function() {
         return DataFromAPI;
     };
-
 }]);
 
 
@@ -110,6 +144,9 @@ mainApp.controller('DataBaseCtrl', ['$scope', 'PostModel', function ($scope, Pos
             });
         }
     };
+    //////////////////
+    //////////////////
+    //////////////////
 
     $scope.returnData = function() {
         return DataFromDB;
@@ -138,46 +175,6 @@ mainApp.controller('DataBaseCtrl', ['$scope', 'PostModel', function ($scope, Pos
     });
 
 }]);
-
-mainApp.controller('weatherListCtrl', function ($scope, $http) {
-    $http.get('api/forecast.json').success(function(doc, status, headers, config) {
-
-        $scope.data = doc;
-
-        //CHART
-        var chart = c3.generate({
-            data: {
-                x: 'x',
-                columns: [
-                    ['x', convertDateForChart($scope.data.list[0].dt),
-                        convertDateForChart($scope.data.list[1].dt),
-                        convertDateForChart($scope.data.list[2].dt),
-                        convertDateForChart($scope.data.list[3].dt),
-                        convertDateForChart($scope.data.list[4].dt),
-                        convertDateForChart($scope.data.list[5].dt),
-                        convertDateForChart($scope.data.list[6].dt)],
-                    ['Температура', $scope.data.list[0].temp.day, $scope.data.list[1].temp.day,
-                        $scope.data.list[2].temp.day, $scope.data.list[3].temp.day,
-                        $scope.data.list[4].temp.day, $scope.data.list[5].temp.day,
-                        $scope.data.list[6].temp.day],
-                ],
-                types: {
-                    "Температура": 'area'
-                }
-            },
-            axis: {
-                x: {
-                    type: 'timeseries',
-                    tick: {
-                        format: '%d.%m'
-                        //'%d.%m.%Y'
-                    }
-                }
-            }
-        });
-
-    });
-});
 
 //FILTER for HTML
 
