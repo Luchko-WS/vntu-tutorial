@@ -48,52 +48,40 @@
                 <div class="sample-show-hide" ng-show="showOperationWithDB">
                     <div class="thumbnail">
                         <h3 class="text-center">Операції з базою даних</h3>
-
                         <h5 class="text-center">Вивести запит:</h5>
-                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-0"> </div>
-                        <div class="col-lg-10 col-md-10 col-sm-10 col-xs-12">
-
-                            <div class="row">
-                                <div class="col-sm-6 col-xs-12">
-                                    <div class="form-group">
-                                        <div class="input-group date" id="datetimepickerMin">
-                                            <input type="text" class="form-control" placeholder="Початкова дата...">
-                                            <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="col-sm-6 col-xs-12">
-                                    <div class="form-group">
-                                        <div class="input-group date" id="datetimepickerMax">
-                                            <input type="text" class="form-control" placeholder="Кінцева дата...">
-                                            <span class="input-group-addon">
-                                                <span class="glyphicon glyphicon-calendar"></span>
-                                            </span>
-                                        </div>
+                        <div class="row">
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    <div class="input-group date" id="datetimepickerMin">
+                                        <input type="text" ng-bind="empty" class="form-control" placeholder="Початкова дата...">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
                                     </div>
                                 </div>
                             </div>
-
-                            <div class="input-group">
-                                <input type="text" class="form-control" ng-model="cityName" placeholder="Назва міста...">
-                                <div class="input-group-btn">
-                                    <a href="#showFromDB">
-                                        <button ng-click="setParameters(cityName); getData()" class="btn btn-primary" type="button">Показати</button>
-                                    </a>
+                            <div class="col-sm-6 col-xs-12">
+                                <div class="form-group">
+                                    <div class="input-group date" id="datetimepickerMax">
+                                        <input type="text" ng-bind="empty" class="form-control" placeholder="Кінцева дата...">
+                                        <span class="input-group-addon">
+                                            <span class="glyphicon glyphicon-calendar"></span>
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-0"> </div>
-
-                        <div style="height: 80px"></div>
-
-                        <h5 class="text-center">Записати даний запит:</h5>
-                        <button class="btn btn-primary center-block" type="button">Зберегти</button>
+                        <div class="input-group">
+                            <input type="text" class="form-control" ng-model="cityName" placeholder="Назва міста...">
+                            <div class="input-group-btn">
+                                <a href="#showFromDB">
+                                    <button ng-click="setParameters(cityName); getData()" class="btn btn-primary" type="button">Показати</button>
+                                </a>
+                            </div>
+                        </div>
+                        <div style="height: 20px"></div>
                     </div>
                 </div>
-                <!-- MUST BE A REQUEST TO DATA BASE AND SHARING DATA BETWEEN CONTROLLERS -->
                 <button ng-click="showOperationWithDB = !showOperationWithDB; changeButtonName();" class="btn btn-primary center-block" type="button">{{buttonName}}</button>
             </div>
             <div class="col-lg-3 col-md-2 col-sm-2 col-xs-1"> </div>

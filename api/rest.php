@@ -22,13 +22,13 @@ $app->add(function ($req, $res, $next) {
 });
 
 /****DON'T WORK****/
-$app->get('/posts/{city},{minDate},{maxDate}', function (Request $request, Response $response, $args) {
+$app->get('/params/{city},{minDate},{maxDate}', function (Request $request, Response $response, $args) {
     $INPcity = $args['city'];
     $INPmDate = $args['minDate'];
     $INPMDate = $args['maxDate'];
 
     file_put_contents('log.txt', 'Отримав параметр: '.$INPcity.' '.$INPmDate.' '.$INPMDate);
-    $rows = DB::fetchAll("SELECT c.id, c.city, w.date, w.dayOfWeek, w.weather, w.temp FROM cities AS c RIGHT JOIN weather AS w ON (c.id=w.id) WHERE city = '".$args['city']."' AND date > '".$args['minDate']."' AND date <= '".$args['maxDate']."';");
+    $rows = DB::fetchAll("SELECT c.id, c.city, w.date, w.dayOfWeek, w.weather, w.temp FROM cities AS c RIGHT JOIN weather AS w ON (c.id=w.id) WHERE city = '".$args['city']."' AND date > '".$args['minDate']."' AND date <= DATE_ADD('".$args['maxDate']."', INTERVAL 1 DAY);");
     $response->getBody()->write('{"data":'.json_encode($rows).'}');
     file_put_contents('out.txt', $response);
     return $response;
@@ -43,17 +43,21 @@ $app->get('/sendRequest/{city}', function (Request $request, Response $response,
     // делаем запрос к апи
     $data = @file_get_contents($url);
     // получили данные
-    file_put_contents('forecast.json', $data);
-});
-
-/*
-$app->get('/posts/{city}', function (Request $request, Response $response, $args) {
-    $input = $args['city'];
-    file_put_contents('log.txt', 'Отримав параметр: '.$input);
-    $rows = DB::fetchAll("SELECT c.id, c.city, w.date, w.dayOfWeek, w.weather, w.temp FROM cities AS c RIGHT JOIN weather AS w ON (c.id=w.id) WHERE city = '".$input."';");
-    $response->getBody()->write('{"data":'.json_encode($rows).'}');
-    file_put_contents('out.txt', $response);
+    //file_put_contents('forecast.json', $data);
+    $response = '{"data":'.$data.'}';
+    //file_put_contents('out.txt', $response);
     return $response;
 });
-*/
+
+$app->post('/params/{city}', function ($request, $response, $args) {
+    $input = $request->getParsedBody();
+    file_put_contents('logSAVE.txt', $input['cod']."   ".$args['cod']);
+
+    $sql = "UPDATE params SET name='".$input['name']."' WHERE id=".$args['id'].";";
+    $params = DB::exec($sql);
+
+    $input['id'] = $args['id'];
+    return $this->response->withJson($input);
+});
+
 $app->run();

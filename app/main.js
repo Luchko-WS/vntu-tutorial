@@ -7,7 +7,7 @@ var Parameters = {
 };
 
 var DataFromDB = {};
-
+var DataFromAPI = {};
 
 ///ROUTES
 
@@ -33,10 +33,12 @@ mainApp.config(['$routeProvider', function ($routeProvider){
 //FACTORY
 
 mainApp.factory('PostModel', ['$resource', function ($resource) {
- return $resource('http://localhost:8088/api/rest.php/posts/:city,:minDate,:maxDate', {'city':'@city'}, {'minDate':'@minDate'}, {'maxDate':'@maxDate'}, {});
+ return $resource('http://localhost:8088/api/rest.php/params/:city,:minDate,:maxDate',
+     {'city':'@city'}, {'minDate':'@minDate'}, {'maxDate':'@maxDate'}, {
+         'update': {method: 'PUT'}
+     });
  }]);
 
-//test
 mainApp.factory('RequestModel', ['$resource', function ($resource) {
     return $resource('http://localhost:8088/api/rest.php/sendRequest/:city', {'city':'@city'}, {});
 }]);
@@ -44,16 +46,20 @@ mainApp.factory('RequestModel', ['$resource', function ($resource) {
 
 //CONTROLLERS
 
-//test
 mainApp.controller('RequestCtrl', ['$scope', 'RequestModel', function ($scope, RequestModel) {
 
     $scope.cityName = "";
 
     $scope.getData = function () {
         RequestModel.get({'city':$scope.cityName}, function (res) {
-            $scope.data = res.data;
+            DataFromAPI = res.data;
         });
     };
+
+    $scope.returnData = function() {
+        return DataFromAPI;
+    };
+
 }]);
 
 
@@ -68,10 +74,15 @@ mainApp.controller('DataBaseCtrl', ['$scope', 'PostModel', function ($scope, Pos
             $scope.buttonName = "Показати інструменти";
         };
 
+    $scope.date1 = "";
+    $scope.date2 = "";
+
     $scope.setParameters = function (cityName) {
         Parameters.cityName = cityName;
-        Parameters.minDate = convertDateForChart(Parameters.minDate/1000);
-        Parameters.maxDate = convertDateForChart(Parameters.maxDate/1000);
+
+        Parameters.minDate = $scope.date1;
+        Parameters.maxDate = $scope.date2;
+
         console.log(Parameters.cityName + ": From " + Parameters.minDate + " to " + Parameters.maxDate);
     };
 
@@ -79,6 +90,25 @@ mainApp.controller('DataBaseCtrl', ['$scope', 'PostModel', function ($scope, Pos
         PostModel.get({'city':Parameters.cityName,'minDate':Parameters.minDate,'maxDate':Parameters.maxDate}, function (res) {
             DataFromDB = res.data;
         });
+    };
+
+
+    //////////////
+    //NOT COMPLETE
+    //////////////
+    $scope.saveData = function (value) {
+
+        var obj = new PostModel(value);
+
+        if (value === undefined) {
+            obj.$save(function(res){
+                console.log('res: ', res);
+            });
+        } else {
+            obj.$update(function(res){
+                console.log('res: ', res);
+            });
+        }
     };
 
     $scope.returnData = function() {
@@ -95,12 +125,14 @@ mainApp.controller('DataBaseCtrl', ['$scope', 'PostModel', function ($scope, Pos
         );
         //При изменении даты в min datetimepicker, она устанавливается как минимальная для max datetimepicker
         $("#datetimepickerMin").on("dp.change",function (e) {
-            Parameters.minDate = e.date;
+            $scope.date1 = e.date;
+            $scope.date1 = convertDateForChart($scope.date1/1000);
             $("#datetimepickerMax").data("DateTimePicker").setMinDate(e.date);
         });
         //При изменении даты в max datetimepicker, она устанавливается как максимальная для min datetimepicker
         $("#datetimepickerMax").on("dp.change",function (e) {
-            Parameters.maxDate = e.date;
+            $scope.date2 = e.date;
+            $scope.date2 = convertDateForChart($scope.date2/1000);
             $("#datetimepickerMin").data("DateTimePicker").setMaxDate(e.date);
         });
     });
@@ -111,7 +143,6 @@ mainApp.controller('weatherListCtrl', function ($scope, $http) {
     $http.get('api/forecast.json').success(function(doc, status, headers, config) {
 
         $scope.data = doc;
-        console.log($scope.data);
 
         //CHART
         var chart = c3.generate({
@@ -146,7 +177,6 @@ mainApp.controller('weatherListCtrl', function ($scope, $http) {
         });
 
     });
-
 });
 
 //FILTER for HTML
