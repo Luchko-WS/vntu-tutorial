@@ -1,13 +1,13 @@
 var mainApp = angular.module('MainApp', ['ngRoute', 'ngResource']);
 
 var Parameters = {
-    cityName: "NONE NONE NONE",
-    minDate : "01-01-2016",
-    maxDate : "01-01-2017"
+    cityName: 'ALL',
+    minDate : '01.01.2016',
+    maxDate : '01.01.2017'
 };
 
 var DataFromDB = {};
-var DataFromAPI = "undefined";
+var DataFromAPI = 'undefined';
 
 ///ROUTES
 
@@ -33,8 +33,7 @@ mainApp.config(['$routeProvider', function ($routeProvider){
 //FACTORY
 
 mainApp.factory('PostModel', ['$resource', function ($resource) {
- return $resource('http://localhost:8088/api/rest.php/params/:city,:minDate,:maxDate',
-     {'city':'@city'}, {'minDate':'@minDate'}, {'maxDate':'@maxDate'}, {
+ return $resource('http://localhost:8088/api/rest.php/params/:id', {'id':'@id'}, {
          'update': {method: 'PUT'}
      });
  }]);
@@ -45,36 +44,39 @@ mainApp.factory('RequestModel', ['$resource', function ($resource) {
 
 
 //CONTROLLERS
-
+var CityInputName;
 mainApp.controller('RequestCtrl', ['$scope', 'RequestModel', function ($scope, RequestModel) {
 
-    $scope.cityName = "";
+    $scope.cityName;
 
     $scope.getData = function () {
-
-        DataFromAPI = "undefined";
-
-        RequestModel.get({'city':$scope.cityName}, function (res) {
+        DataFromAPI = 'undefined';
+        CityInputName = $scope.cityName;
+        RequestModel.get({'city':CityInputName}, function (res) {
             DataFromAPI = res.data;
+            });
+    };
 
+    $scope.drawChart = function(){
+        if(DataFromAPI != 'undefined') {
             var chart = c3.generate({
                 data: {
                     x: 'x',
                     columns: [
-                        ['x', convertDateForChart(DataFromAPI.list[0].dt),
-                            convertDateForChart(DataFromAPI.list[1].dt),
-                            convertDateForChart(DataFromAPI.list[2].dt),
-                            convertDateForChart(DataFromAPI.list[3].dt),
-                            convertDateForChart(DataFromAPI.list[4].dt),
-                            convertDateForChart(DataFromAPI.list[5].dt),
-                            convertDateForChart(DataFromAPI.list[6].dt)],
+                        ['x', dateToFormatString(DataFromAPI.list[0].dt * 1000, 'yyyy-mm-dd'),
+                            dateToFormatString(DataFromAPI.list[1].dt * 1000, 'yyyy-mm-dd'),
+                            dateToFormatString(DataFromAPI.list[2].dt * 1000, 'yyyy-mm-dd'),
+                            dateToFormatString(DataFromAPI.list[3].dt * 1000, 'yyyy-mm-dd'),
+                            dateToFormatString(DataFromAPI.list[4].dt * 1000, 'yyyy-mm-dd'),
+                            dateToFormatString(DataFromAPI.list[5].dt * 1000, 'yyyy-mm-dd'),
+                            dateToFormatString(DataFromAPI.list[6].dt * 1000, 'yyyy-mm-dd')],
                         ['Температура', DataFromAPI.list[0].temp.day, DataFromAPI.list[1].temp.day,
                             DataFromAPI.list[2].temp.day, DataFromAPI.list[3].temp.day,
                             DataFromAPI.list[4].temp.day, DataFromAPI.list[5].temp.day,
                             DataFromAPI.list[6].temp.day],
                     ],
                     types: {
-                        "Температура": 'area'
+                        'Температура': 'area'
                     }
                 },
                 axis: {
@@ -87,8 +89,11 @@ mainApp.controller('RequestCtrl', ['$scope', 'RequestModel', function ($scope, R
                     }
                 }
             });
+        }
+    };
 
-        });
+    $scope.returnInputCityName = function(){
+        return CityInputName;
     };
 
     $scope.returnData = function() {
@@ -97,181 +102,212 @@ mainApp.controller('RequestCtrl', ['$scope', 'RequestModel', function ($scope, R
 }]);
 
 
-mainApp.controller('DataBaseCtrl', ['$scope', 'PostModel', function ($scope, PostModel) {
+mainApp.controller('DataBaseCtrl', ['$scope', '$http', 'PostModel', function ($scope, $http, PostModel) {
 
-    $scope.buttonName = "Показати інструменти";
+    $scope.buttonName = 'Показати інструменти';
 
     $scope.changeButtonName = function () {
-        if($scope.buttonName == "Показати інструменти")
-            $scope.buttonName = "Приховати інструменти";
+        if($scope.buttonName == 'Показати інструменти')
+            $scope.buttonName = 'Приховати інструменти';
         else
-            $scope.buttonName = "Показати інструменти";
-        };
-
-    $scope.date1 = "";
-    $scope.date2 = "";
-
-    $scope.setParameters = function (cityName) {
-        Parameters.cityName = cityName;
-
-        Parameters.minDate = $scope.date1;
-        Parameters.maxDate = $scope.date2;
-
-        console.log(Parameters.cityName + ": From " + Parameters.minDate + " to " + Parameters.maxDate);
+            $scope.buttonName = 'Показати інструменти';
     };
 
+    $scope.date1;
+    $scope.date2;
+
+    $scope.setParameters = function (cityName) {
+
+        if(cityName === undefined || cityName === '')
+            cityName = 'ALL';
+
+        if($scope.date1 === undefined || $scope.date1 == '')
+            $scope.date1 = '01.01.2016';
+
+        if($scope.date2 === undefined || $scope.date2 == '') {
+            var theDate = new Date();
+            theDate.setMonth(theDate.getMonth()+1);
+            $scope.date2 = dateToFormatString(theDate, 'dd.mm.yyyy');
+        }
+
+        Parameters.cityName = cityName;
+        Parameters.minDate = dateToFormatString($scope.date1, 'yyyy-mm-dd', 'dd.mm.yyyy');
+        Parameters.maxDate = dateToFormatString($scope.date2, 'yyyy-mm-dd', 'dd.mm.yyyy');
+
+        //розглянь випадок, коли дата вводиться в текстове поле.
+        //або всі записи робити в стандартному форматі. а потім той текст конвертувати і потрібний формат
+    };
+
+    $(function () {
+        //Инициализация datetimepickerMin и datetimepickerMax
+        $("#dateTimePickerMin").datetimepicker(
+            {pickTime: false, language: 'ru'}
+        );
+        $("#dateTimePickerMax").datetimepicker(
+            {pickTime: false, language: 'ru'}
+        );
+        //При изменении даты в min datetimepicker, она устанавливается как минимальная для max datetimepicker
+        $("#dateTimePickerMin").on("dp.change",function (e) {
+            $scope.date1 = e.date;
+            $scope.date1 = dateToFormatString($scope.date1, 'dd.mm.yyyy');
+            $("#dateTimePickerMax").data('DateTimePicker').setMinDate(e.date);
+        });
+        //При изменении даты в max datetimepicker, она устанавливается как максимальная для min datetimepicker
+        $("#dateTimePickerMax").on("dp.change",function (e) {
+            $scope.date2 = e.date;
+            $scope.date2 = dateToFormatString($scope.date2, 'dd.mm.yyyy');
+            $("#dateTimePickerMin").data("DateTimePicker").setMaxDate(e.date);
+        });
+    });
+
     $scope.getData = function () {
-        PostModel.get({'city':Parameters.cityName,'minDate':Parameters.minDate,'maxDate':Parameters.maxDate}, function (res) {
+        PostModel.get({'id':JSON.stringify(Parameters)}, function (res) {
             DataFromDB = res.data;
         });
     };
 
-
-    //////////////
-    //NOT COMPLETE
-    //////////////
     $scope.saveData = function (value) {
 
-        var obj = new PostModel(value);
+        var obj = value;
+        obj.inputCityName = CityInputName;
+        obj.convertDate = [0,0,0,0,0,0,0];
+        obj.convertDay = [0,0,0,0,0,0,0];
+        for(var i=0; i<7; i++){
+            obj.convertDay[i] = getDayOfWeek(value.list[i].dt);
+            obj.convertDate[i] = dateToFormatString(value.list[i].dt*1000, 'yyyy-mm-dd');
+        }
 
-        if (value === undefined) {
-            obj.$save(function(res){
-                console.log('res: ', res);
+        console.log(obj);
+
+        PostModel.save(value, function(res){
+            console.log(res);
+        });
+    };
+
+    $scope.deleteData = function(value){
+
+        value = {
+            "one":1,
+            "two":2
+        };
+
+        var answer = confirm("Ви дійсно бажаєте видалити усі дані? ");
+        if (answer === true) {
+            PostModel.delete(value, function (res) {
+                console.log(res);
             });
-        } else {
-            obj.$update(function(res){
-                console.log('res: ', res);
-            });
+            alert('Дані видалено!');
         }
     };
-    //////////////////
-    //////////////////
-    //////////////////
 
     $scope.returnData = function() {
         return DataFromDB;
     };
 
-    $(function () {
-        //Инициализация datetimepickerMin и datetimepickerMax
-        $("#datetimepickerMin").datetimepicker(
-            {pickTime: false, language: 'ru'}
-        );
-        $("#datetimepickerMax").datetimepicker(
-            {pickTime: false, language: 'ru'}
-        );
-        //При изменении даты в min datetimepicker, она устанавливается как минимальная для max datetimepicker
-        $("#datetimepickerMin").on("dp.change",function (e) {
-            $scope.date1 = e.date;
-            $scope.date1 = convertDateForChart($scope.date1/1000);
-            $("#datetimepickerMax").data("DateTimePicker").setMinDate(e.date);
-        });
-        //При изменении даты в max datetimepicker, она устанавливается как максимальная для min datetimepicker
-        $("#datetimepickerMax").on("dp.change",function (e) {
-            $scope.date2 = e.date;
-            $scope.date2 = convertDateForChart($scope.date2/1000);
-            $("#datetimepickerMin").data("DateTimePicker").setMaxDate(e.date);
-        });
-    });
-
 }]);
+
+//ADDITIONAL FUNCTIONS
+function dateToFormatString(value, targetFormat, oldFormat) {
+
+    var dd, mm, yyyy;
+
+    if(oldFormat === undefined) {
+        var theDate = new Date(value);
+        dd = theDate.getDate(), mm = theDate.getMonth() + 1, yyyy = theDate.getFullYear();
+        if (dd < 10) dd = '0' + dd;
+        if (mm < 10) mm = '0' + mm;
+    }
+    else {
+        var array;
+        switch (oldFormat){
+            case 'yyyy-mm-dd':
+                array = value.split('-');
+                dd = array[2], mm = array[1], yyyy = array[0];
+                console.log("OLD: " + array);
+                break;
+            case 'dd.mm.yyyy':
+                array = value.split('.');
+                dd = array[0], mm = array[1], yyyy = array[2];
+                console.log("OLD: " + array);
+                break;
+            default:
+                return value;
+        }
+    }
+
+    switch (targetFormat) {
+        case 'yyyy-mm-dd':
+            return yyyy + '-' + mm + '-' + dd;
+        case 'dd.mm.yyyy':
+        default:
+            return dd + '.' + mm + '.' + yyyy;
+
+    }
+};
+
+function getDayOfWeek(value) {
+    var theDate = new Date(value*1000);
+
+    switch (theDate.getDay()) {
+        case 1:
+            return 'Пн';
+        case 2:
+            return 'Вт';
+        case 3:
+            return 'Ср';
+        case 4:
+            return 'Чт';
+        case 5:
+            return 'Пт';
+        case 6:
+            return 'Сб';
+        case 0:
+            return 'Нд';
+    }
+};
 
 //FILTER for HTML
 
 mainApp.filter('formatLargeIconFilter', function(){
     return function(value) {
         switch (value) {
-            case "Clear":
-                return "assets/img/sun.jpg";
-            case "Sun":
-                return "assets/img/sun.jpg";
-            case "Rain":
-                return "assets/img/rain.jpg";
-            case "Snow":
-                return "assets/img/snow.jpg";
-            case "Extreme":
-                return "assets/img/extreme.jpg";
-            case "Clouds":
-                return "assets/img/cloudy.jpg";
+            case 'Clear':
+                return 'assets/img/sun.jpg';
+            case 'Sun':
+                return 'assets/img/sun.jpg';
+            case 'Rain':
+                return 'assets/img/rain.jpg';
+            case 'Snow':
+                return 'assets/img/snow.jpg';
+            case 'Extreme':
+                return 'assets/img/extreme.jpg';
+            case 'Clouds':
+                return 'assets/img/cloudy.jpg';
             default:
                 //icon-small
                 //icon-sun
                 //icon-cloudy
-                return "icon-small";
+                return 'icon-small';
         }
     }
 });
 
-
-//for chart
-function convertDateForChart(value) {
-
-        var theDate = new Date(value * 1000);
-        dateString = theDate.toGMTString();
-
-        str = dateString.substr(12, 4) + "-";
-
-        switch (dateString.substr(8, 3)) {
-            case "Jan":
-                str = str + "01-";
-                break;
-            case "Feb":
-                str = str + "02-";
-                break;
-            case "Mar":
-                str = str + "03-";
-                break;
-            case "Apr":
-                str = str + "04-";
-                break;
-            case "May":
-                str = str + "05-";
-                break;
-            case "Jun":
-                str = str + "06-";
-                break;
-            case "Jul":
-                str = str + "07-";
-                break;
-            case "Aug":
-                str = str + "08-";
-                break;
-            case "Sep":
-                str = str + "09-";
-                break;
-            case "Oct":
-                str = str + "10-";
-                break;
-            case "Nov":
-                str = str + "11-";
-                break;
-            case "Dec":
-                str = str + "12-";
-                break;
-        }
-
-        str = str + dateString.substr(5, 2);
-
-        return str;
-};
-
-//FILTER for HTML
 mainApp.filter('formatIconFilter', function(){
     return function(value) {
         switch (value) {
-            case "Sun":
-                return "icon-clear";
-            case "Rain":
-                return "icon-rain";
-            case  "Snow":
-                return "icon-snowflake";
-            case "Extreme":
-                return "icon-cloud";
+            case 'Sun':
+                return 'icon-clear';
+            case 'Rain':
+                return 'icon-rain';
+            case  'Snow':
+                return 'icon-snowflake';
+            case 'Extreme':
+                return 'icon-cloud';
             default:
                 //icon-small
                 //icon-sun
                 //icon-cloudy
-                return "icon-small";
+                return 'icon-small';
         }
     }
 });
@@ -279,68 +315,35 @@ mainApp.filter('formatIconFilter', function(){
 mainApp.filter('formaShortDateFilter', function(){
     return function(value) {
         var theDate = new Date(value * 1000);
-        dateString = theDate.toGMTString();
-
-        str = dateString.substr(8, 3);
-        dateString = dateString.substr(5, 2) + ".";
-
-        switch (str) {
-            case "Jan":
-                return dateString + "01";
-            case "Feb":
-                return dateString + "02";
-            case "Mar":
-                return dateString + "03";
-            case "Apr":
-                return dateString + "04";
-            case "May":
-                return dateString + "05";
-            case "Jun":
-                return dateString + "06";
-            case "Jul":
-                return dateString + "07";
-            case "Aug":
-                return dateString + "08";
-            case "Sep":
-                return dateString + "09";
-            case "Oct":
-                return dateString + "10";
-            case "Nov":
-                return dateString + "11";
-            case "Dec":
-                return dateString + "12";
-        }
+        return theDate.getDate() + '.' + (theDate.getMonth() + 1);
     }
 });
 
 mainApp.filter('formatDayOfWeekFilter', function(){
     return function(value) {
         var theDate = new Date(value*1000);
-        dateString = theDate.toGMTString();
 
-        dateString = dateString.substr(0,3);
-
-        switch (dateString) {
-            case "Mon":
-                return "Пн";
-            case "Tue":
-                return "Вт";
-            case "Wed":
-                return "Ср";
-            case "Thu":
-                return "Чт";
-            case "Fri":
-                return "Пт";
-            case "Sat":
-                return "Сб";
-            case "Sun":
-                return "Нд";
+        switch (theDate.getDay()) {
+            case 1:
+                return 'Пн';
+            case 2:
+                return 'Вт';
+            case 3:
+                return 'Ср';
+            case 4:
+                return 'Чт';
+            case 5:
+                return 'Пт';
+            case 6:
+                return 'Сб';
+            case 0:
+                return 'Нд';
         }
     }
 });
 
 mainApp.filter('formatTempFilter', function(){
     return function(value) {
-        return value + "°C";
+        return value + '°C';
     }
 });

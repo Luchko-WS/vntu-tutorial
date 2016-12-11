@@ -52,8 +52,8 @@
                         <div class="row">
                             <div class="col-sm-6 col-xs-12">
                                 <div class="form-group">
-                                    <div class="input-group date" id="datetimepickerMin">
-                                        <input type="text" ng-bind="empty" class="form-control" placeholder="Початкова дата...">
+                                    <div class="input-group date" id="dateTimePickerMin">
+                                        <input type="text" ng-model="date1" class="form-control" placeholder="Початкова дата...">
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -62,8 +62,8 @@
                             </div>
                             <div class="col-sm-6 col-xs-12">
                                 <div class="form-group">
-                                    <div class="input-group date" id="datetimepickerMax">
-                                        <input type="text" ng-bind="empty" class="form-control" placeholder="Кінцева дата...">
+                                    <div class="input-group date" id="dateTimePickerMax">
+                                        <input type="text" ng-model="date2" class="form-control" placeholder="Кінцева дата...">
                                         <span class="input-group-addon">
                                             <span class="glyphicon glyphicon-calendar"></span>
                                         </span>
@@ -71,14 +71,14 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="input-group">
+
+                        <div style="text-align: center">
                             <input type="text" class="form-control" ng-model="cityName" placeholder="Назва міста...">
-                            <div class="input-group-btn">
-                                <a href="#showFromDB">
-                                    <button ng-click="setParameters(cityName); getData()" class="btn btn-primary" type="button">Показати</button>
-                                </a>
-                            </div>
+                            <div style="height: 10px"></div>
+                            <a href="#showFromDB"><button ng-click="setParameters(cityName); getData()" class="btn btn-success" type="submit">Показати дані</button></a>
+                            <button ng-click="deleteData(0)" class="btn btn-warning">Видалити дані</button>
                         </div>
+
                         <div style="height: 20px"></div>
                     </div>
                 </div>
