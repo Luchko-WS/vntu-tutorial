@@ -10,7 +10,8 @@
 
 </head>
 <body>
-    <div ng-controller="RequestCtrl" ng-model="data=returnData()">
+    <div ng-controller="RequestCtrl">
+        {{returnData()}}
         <div ng-if="data!='empty' && data!='null'" ng-init="drawChart()">
             <div class="thumbnail">
                 <img ng-src="{{data.list[0].weather[0].main | formatLargeIconFilter}}" width="320px" heidht ="320px" alt="..." class="img-rounded">

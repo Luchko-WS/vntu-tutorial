@@ -10,7 +10,8 @@
 
 </head>
 <body>
-    <div ng-controller="DataBaseCtrl" ng-model="data=returnData()">
+    <div ng-controller="DataBaseCtrl">
+        {{returnData()}}
         <div ng-if="data!='empty' && data.length!=0" class="row padded">
             <div ng-repeat="item in data">
                 <div class="col-sm-6 col-xs-12">

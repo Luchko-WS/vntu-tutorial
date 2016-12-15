@@ -14,12 +14,10 @@ function dateToFormatString(value, targetFormat, oldFormat) {
             case 'yyyy-mm-dd':
                 array = value.split('-');
                 dd = array[2], mm = array[1], yyyy = array[0];
-                console.log("OLD: " + array);
                 break;
             case 'dd.mm.yyyy':
                 array = value.split('.');
                 dd = array[0], mm = array[1], yyyy = array[2];
-                console.log("OLD: " + array);
                 break;
             default:
                 return value;

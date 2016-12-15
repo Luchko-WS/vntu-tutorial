@@ -1,6 +1,7 @@
 var CityInputName;
 mainApp.controller('RequestCtrl', ['$scope', 'RequestModel', function ($scope, RequestModel) {
 
+    $scope.data;
     $scope.cityName;
 
     $scope.getData = function () {
@@ -55,12 +56,14 @@ mainApp.controller('RequestCtrl', ['$scope', 'RequestModel', function ($scope, R
     };
 
     $scope.returnData = function() {
-        return DataFromAPI;
+        $scope.data = DataFromAPI;
     };
 }]);
 
 
 mainApp.controller('DataBaseCtrl', ['$scope', '$http', 'PostModel', function ($scope, $http, PostModel) {
+
+    $scope.data;
 
     $scope.buttonName = 'Показати інструменти';
 
@@ -153,7 +156,7 @@ mainApp.controller('DataBaseCtrl', ['$scope', '$http', 'PostModel', function ($s
     };
 
     $scope.returnData = function() {
-        return DataFromDB;
+        $scope.data = DataFromDB;
     };
 
 }]);
