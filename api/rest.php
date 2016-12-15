@@ -61,7 +61,7 @@ $app->post('/params', function ($request, $response, $args) {
 
     //отримуємо ідентифікатор міста SELECT id FROM cities WHERE city='London'
     $rows = DB::fetchAll("SELECT id FROM cities WHERE city='".$cityName."'");
-    $id = $rows[0]["id"];
+    $id = $rows[0]['id'];
 
     //записуємо прогноз
     for($i=0; $i<7; $i++){
@@ -96,7 +96,7 @@ $app->delete('/params', function ($request, $response, $args) {
 
     $sql = "DELETE FROM weather WHERE id > 0;";
     $params = DB::exec($sql);
-    //file_put_contents('delete.txt', $args['one']);
+    //file_put_contents('delete.txt', $input);
 
     return $this->response->true;
 });
@@ -107,7 +107,11 @@ $app->get('/sendRequest/{city}', function (Request $request, Response $response,
     $city = $args['city'];
     $url = "http://api.openweathermap.org/data/2.5/forecast/daily?q=".$args['city']."&units=metric&cnt=7&APPID=531d4a54f4acb25f72b62eab815bc362";
     $data = @file_get_contents($url);
-    $response = '{"data":'.$data.'}';
+
+    if($data)
+        $response = '{"data":'.$data.'}';
+    else
+        $response = 'Not found!';
     return $response;
 });
 

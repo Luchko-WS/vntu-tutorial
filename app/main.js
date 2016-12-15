@@ -6,23 +6,19 @@ var Parameters = {
     maxDate : '01.01.2017'
 };
 
-var DataFromDB = {};
-var DataFromAPI = 'undefined';
+var DataFromDB = 'empty';
+var DataFromAPI = 'empty';
 
 ///ROUTES
 
 mainApp.config(['$routeProvider', function ($routeProvider){
     $routeProvider
-        .when('/demo', {
-            templateUrl: 'index2.html'
-            //controller: 'MainController'
-        })
         .when('/showFromDB', {
-            templateUrl: 'showFromDB.html',
+            templateUrl: 'views//showFromDB.html',
             controller: ''
         })
         .when('/forecast', {
-            templateUrl: 'forecast.html'
+            templateUrl: 'views//forecast.html'
         })
         .otherwise({
             redirectTo: '/'
@@ -50,15 +46,19 @@ mainApp.controller('RequestCtrl', ['$scope', 'RequestModel', function ($scope, R
     $scope.cityName;
 
     $scope.getData = function () {
-        DataFromAPI = 'undefined';
+        DataFromAPI = 'empty';
         CityInputName = $scope.cityName;
         RequestModel.get({'city':CityInputName}, function (res) {
-            DataFromAPI = res.data;
-            });
+            if(res.data === undefined)
+                DataFromAPI = 'null';
+            else
+                DataFromAPI = res.data;
+        });
+
     };
 
     $scope.drawChart = function(){
-        if(DataFromAPI != 'undefined') {
+        if(DataFromAPI != 'empty') {
             var chart = c3.generate({
                 data: {
                     x: 'x',
@@ -161,6 +161,7 @@ mainApp.controller('DataBaseCtrl', ['$scope', '$http', 'PostModel', function ($s
     });
 
     $scope.getData = function () {
+        DataFromDB = 'empty';
         PostModel.get({'id':JSON.stringify(Parameters)}, function (res) {
             DataFromDB = res.data;
         });
@@ -177,8 +178,6 @@ mainApp.controller('DataBaseCtrl', ['$scope', '$http', 'PostModel', function ($s
             obj.convertDate[i] = dateToFormatString(value.list[i].dt*1000, 'yyyy-mm-dd');
         }
 
-        console.log(obj);
-
         PostModel.save(value, function(res){
             console.log(res);
         });
@@ -186,14 +185,9 @@ mainApp.controller('DataBaseCtrl', ['$scope', '$http', 'PostModel', function ($s
 
     $scope.deleteData = function(value){
 
-        value = {
-            "one":1,
-            "two":2
-        };
-
         var answer = confirm("Ви дійсно бажаєте видалити усі дані? ");
         if (answer === true) {
-            PostModel.delete(value, function (res) {
+            PostModel.delete(function (res) {
                 console.log(res);
             });
             alert('Дані видалено!');
